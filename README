@@ -1,0 +1,6 @@
+Python code to measure BOSS windows from FKP estimator
+FKP estimator is from nbodykit: https://nbodykit.readthedocs.io/
+
+python script measure_Qk.py: measure the Fourier-space window Q(k) using the FKP estimator with the same settings of the corresponding power spectrum measurements but for 4 choices of box side length: 100000, 30000, 3500, 1000
+
+jupyter notebook Qs_from_Qk.ipynb: perform the spherical-Bessel transform of Q(k) to Q(s)
