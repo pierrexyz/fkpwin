@@ -6,7 +6,7 @@ from numpy.linalg import norm
 from scipy.interpolate import interp1d
 
 # Read command line arguments
-Nmesh = 2**10 # 2^10 = 1024: this might require a lot of memory, (2^10)^3 * 6 * 16 bits ~ 100Gb! 
+Nmesh = 2**4 # 2**10 # 2^10 = 1024: this might require a lot of memory, (2^10)^3 * 6 * 16 bits ~ 100Gb! 
 n_wide = int(sys.argv[1]) # wide-angle expansion order
 boxside = float(sys.argv[2]) # 100000, 35000, 10000, 3500
 boxsize = [boxside, boxside, boxside]
@@ -77,8 +77,9 @@ r = ConvolvedFFTPower(mesh, poles=[0,1,2,3,4], second=mesh2, kmin=0.)
 
 print ('multipole computed')
 
-# alpha
-alpha = 1.0 * data.csize / randoms.csize
+# alpha and norm
+alpha = np.sum(data['WEIGHT'].compute()) / np.sum(randoms['WEIGHT'].compute())                     # ratio of weighted number of data objects over the number of randoms
+norm = np.sum(data['NZ'].compute() * data['WEIGHT'].compute() * data['WEIGHT_FKP'].compute()**2)   # BOSS normalization to be compared with
 
 # window
 win = np.stack([r.poles['k'], r.poles['power_0'].real, r.poles['power_1'].imag, r.poles['power_2'].real, r.poles['power_3'].imag, r.poles['power_4'].real]).T
@@ -86,7 +87,7 @@ win = np.stack([r.poles['k'], r.poles['power_0'].real, r.poles['power_1'].imag, 
 # saving file
 if not os.path.exists(out_dir): os.makedirs(out_dir)
 np.savetxt(os.path.join(out_dir, 'Qk_n%s_nseries.dat') % (n_wide), 
-    win, fmt='%.6e', header='k, q0, q1/i, q2, q3/i, q4, norm, alpha = %s, %s' % (r.attrs["data.norm"], alpha))
+    win, fmt='%.6e', header='k, q0, q1/i, q2, q3/i, q4, norm, alpha = %.5e, %.5e' % (norm, alpha))
 
 print ('file saved')
 

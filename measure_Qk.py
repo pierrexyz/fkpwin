@@ -5,7 +5,7 @@ import numpy as np
 from numpy.linalg import norm
 
 # Read command line arguments
-Nmesh = 2**10 # 2^10 = 1024: this might require a lot of memory, (2^10)^3 * 6 * 16 bits ~ 100Gb! 
+Nmesh = 2**4 # 2**10 # 2^10 = 1024: this might require a lot of memory, (2^10)^3 * 4 (TSC) * 2 (aliasing) * 16 bits ~ 137Gb! 
 n_wide = int(sys.argv[1]) # wide-angle expansion order
 red = str(sys.argv[2]) # cmass or lowz
 sky = str(sys.argv[3]) # ngc or sgc
@@ -70,13 +70,13 @@ print ('FKP catalogs instanciated')
 
 # dtype='c16' or 'c8' to get correct odd multipoles, see https://nbodykit.readthedocs.io/en/latest/api/_autosummary/nbodykit.algorithms.convpower.catalog.html#nbodykit.algorithms.convpower.catalog.FKPCatalog.to_mesh
 mesh = fkp.to_mesh(Nmesh=Nmesh, BoxSize=boxsize, nbar='NZ', dtype='c8', # 'c8' for lower memory usage
-    fkp_weight='WEIGHT_FKP', comp_weight='WEIGHT', resampler='tsc', interlaced=True) 
+    fkp_weight='WEIGHT_FKP', comp_weight='WEIGHT', compensated=True, resampler='tsc', interlaced=True) 
 
 if n_wide == 0: 
     mesh2 = None
 elif n_wide > 0: 
     mesh2 = fkp.to_mesh(Nmesh=Nmesh, BoxSize=boxsize, nbar='NZ', dtype='c8', 
-        fkp_weight='WEIGHT_FKP_2', comp_weight='WEIGHT', resampler='tsc', interlaced=True) 
+        fkp_weight='WEIGHT_FKP_2', comp_weight='WEIGHT', compensated=True, resampler='tsc', interlaced=True) 
 
 print ('mesh grid created')
 
@@ -85,8 +85,9 @@ r = ConvolvedFFTPower(mesh, poles=[0,1,2,3,4], second=mesh2, kmin=0.)
 
 print ('multipole computed')
 
-# alpha
-alpha = 1.0 * data.csize / randoms.csize
+# alpha and norm
+alpha = np.sum(data['WEIGHT'].compute()) / np.sum(randoms['WEIGHT'].compute())                     # ratio of weighted number of data objects over the number of randoms
+norm = np.sum(data['NZ'].compute() * data['WEIGHT'].compute() * data['WEIGHT_FKP'].compute()**2)   # BOSS normalization to be compared with
 
 # window
 win = np.stack([r.poles['k'], r.poles['power_0'].real, r.poles['power_1'].imag, r.poles['power_2'].real, r.poles['power_3'].imag, r.poles['power_4'].real]).T
@@ -94,7 +95,7 @@ win = np.stack([r.poles['k'], r.poles['power_0'].real, r.poles['power_1'].imag, 
 # saving file
 if not os.path.exists(out_dir): os.makedirs(out_dir)
 np.savetxt(os.path.join(out_dir, 'Qk_n%s_boss_%s_%s.dat') % (n_wide, red, sky), 
-    win, fmt='%.6e', header='k, q0, q1/i, q2, q3/i, q4, norm, alpha = %s, %s' % (r.attrs["data.norm"], alpha))
+    win, fmt='%.6e', header='k, q0, q1/i, q2, q3/i, q4, norm, alpha = %.5e, %.5e' % (norm, alpha))
 
 print ('file saved')
 
