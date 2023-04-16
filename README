@@ -9,5 +9,6 @@ jupyter notebook Wkkp_from_Qs.ipynb: compute Fourier-convolution matrix W(k,kp) 
 
 jupyter notebook example_Pk.ipynb: compute the multipoles of the linear galaxy power spectrum in redshift space with geometrical effects: window, integral constraint, wide-angle, and binning. 
 
-v0.1 (22/07/13): window functions with consistent normalization
-v0.2 (23/02/19): normalization accuracy improved, added integral constraint and wide-angle effects
+v0.1.0 (22/07/13): window functions with consistent normalization
+v0.1.1 (23/02/19): added integral constraint and wide-angle effects
+v0.1.2 (32/04/16): normalization accuracy improved
