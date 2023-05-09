@@ -77,9 +77,16 @@ r = ConvolvedFFTPower(mesh, poles=[0,1,2,3,4], second=mesh2, kmin=0.)
 
 print ('multipole computed')
 
-# alpha and norm
-alpha = np.sum(data['WEIGHT'].compute()) / np.sum(randoms['WEIGHT'].compute())                     # ratio of weighted number of data objects over the number of randoms
-norm = np.sum(data['NZ'].compute() * data['WEIGHT'].compute() * data['WEIGHT_FKP'].compute()**2)   # BOSS normalization to be compared with
+# alpha, norm, and shot noise 
+n_d, w_d, wfkp_d = data['NZ'].compute(), data['WEIGHT'].compute(), data['WEIGHT_FKP'].compute() 
+n_r, w_r, wfkp_r = randoms['NZ'].compute(), randoms['WEIGHT'].compute(), randoms['WEIGHT_FKP'].compute() # note that n_r already carries one power of alpha!!!
+alpha = np.sum(w_d) / np.sum(w_r) 
+
+def Iab(a, b, n, w, wfkp, alpha=1., beta=1.):
+    return alpha * np.sum((beta * n)**(a-1.) * w * wfkp**b)
+
+I22_d, I33_d, I12_d, I13_d = Iab(2, 2, n_d, w_d, wfkp_d), Iab(3, 3, n_d, w_d, wfkp_d), Iab(1, 2, n_d, w_d, wfkp_d), Iab(1, 3, n_d, w_d, wfkp_d), 
+I22_r, I33_r, I12_r, I13_r = Iab(2, 2, n_r, w_r, wfkp_r, alpha=alpha), Iab(3, 3, n_r, w_r, wfkp_r, alpha=alpha), Iab(1, 2, n_r, w_r, wfkp_r, alpha=alpha), Iab(1, 3, n_r, w_r, wfkp_r, alpha=alpha) 
 
 # window
 win = np.stack([r.poles['k'], r.poles['power_0'].real, r.poles['power_1'].imag, r.poles['power_2'].real, r.poles['power_3'].imag, r.poles['power_4'].real]).T
@@ -87,7 +94,9 @@ win = np.stack([r.poles['k'], r.poles['power_0'].real, r.poles['power_1'].imag, 
 # saving file
 if not os.path.exists(out_dir): os.makedirs(out_dir)
 np.savetxt(os.path.join(out_dir, 'Qk_n%s_nseries.dat') % (n_wide), 
-    win, fmt='%.6e', header='k, q0, q1/i, q2, q3/i, q4, norm, alpha = %.5e, %.5e' % (norm, alpha))
+    win, fmt='%.6e', header='k, q0, q1/i, q2, q3/i, q4 | ' +
+    'alpha, I22_d, I22_r, I33_d, I33_r, I12_d, I12_r, I13_d, I13_r = %.5e, %.5e, %.5e, %.5e, %.5e, %.5e, %.5e, %.5e, %.5e' % (alpha, I22_d, I22_r, I33_d, I33_r, I12_d, I12_r, I13_d, I13_r)
+) 
 
 print ('file saved')
 
