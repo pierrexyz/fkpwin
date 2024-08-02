@@ -1,5 +1,0 @@
-numpy
-scipy
-pyyaml
-astropy
-mpmath
