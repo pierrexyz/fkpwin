@@ -7,7 +7,7 @@ setup(
     author="Pierre Zhang",
     license='MIT',
     packages=['fkpwin'],
-    install_requires=['numpy', 'scipy', 'pyyaml', 'astropy', 'mpmath'],
+    install_requires=['numpy', 'scipy', 'pyyaml', 'astropy', 'mpmath', 'fftlog @ git+https://github.com/pierrexyz/fftlog'],
     package_dir = {'fkpwin': 'fkpwin'},
     zip_safe=False,
 

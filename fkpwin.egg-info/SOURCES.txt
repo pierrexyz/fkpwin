@@ -1,10 +1,10 @@
 README.md
 setup.py
-fkpwin/config.py
 fkpwin/fkpwin.py
 fkpwin/jax_special.py
 fkpwin/module.py
 fkpwin/sphere.py
+fkpwin/utils.py
 fkpwin.egg-info/PKG-INFO
 fkpwin.egg-info/SOURCES.txt
 fkpwin.egg-info/dependency_links.txt

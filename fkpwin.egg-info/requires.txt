@@ -3,3 +3,4 @@ scipy
 pyyaml
 astropy
 mpmath
+fftlog@ git+https://github.com/pierrexyz/fftlog
