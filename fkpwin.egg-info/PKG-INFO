@@ -1,0 +1,12 @@
+Metadata-Version: 2.1
+Name: fkpwin
+Version: 0.2.0
+Summary: Window functions for FKP-like estimators of Fourier-space correlation functions
+Author: Pierre Zhang
+License: MIT
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Environment :: Console
+Classifier: Programming Language :: Python
