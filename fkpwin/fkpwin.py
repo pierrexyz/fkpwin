@@ -3,7 +3,7 @@ from fftlog.fftlog import FFTLog
 from fftlog.sbt import SBT, MPC
 
 class WindowMatrix(): 
-    def __init__(self, s=None, k=None, kedges=None, ells=[0, 2, 4], NFFT=1024 * 8, smin=1., smax=1e5):
+    def __init__(self, s=None, k=None, dk=None, kedges=None, ells=[0, 2, 4], NFFT=1024 * 8, smin=1., smax=1e5):
         
         self.ells = ells
 
@@ -11,8 +11,11 @@ class WindowMatrix():
         self.fft = FFTLog(**self.fftsettings)
 
         if s is None: s = self.fft.x # s = np.geomspace(1e-4, 1e5, 1024*16); s = s[s > smin]
-        if k is None: k = np.arange(1e-4, .5, 1e-3)
-        self.s, self.k, self.kedges = s, k, kedges
+        if k is None: 
+            dk = 1e-3
+            k = np.arange(1e-4, .5, dk)
+            dk = array(len(k) * [dk])
+        self.s, self.k, self.dk, self.kedges = s, k, dk, kedges
         
         self.fft.mode = 'exact' if array_equal(self.s, self.fft.x) else 'interp' 
         self.pPow = exp(einsum('n,s->ns', -self.fft.Pow-3., log(self.k)))
@@ -35,7 +38,7 @@ class WindowMatrix():
 
     def qs_from_qk(self, qk, k=None):
         kk = self.k if k is None else k
-        qs = self.sbt.get_transform(kk, qk)
+        qs = self.sbt.get_transform(kk, qk, sum_ell=True)
         qs /= qs[0,0]
         return qs
 
@@ -83,7 +86,7 @@ class WindowMatrix():
         return self.wlm
 
     def save_to(self, filename): 
-        to_save = {'ells': self.ells, 'kedges': self.kedges, 'p': self.k, 'wlmkp': self.wlm} 
+        to_save = {'ells': self.ells, 'kedges': self.kedges, 'p': self.k, 'wlmkp': real(self.wlm), 'wlmkp_dp': einsum('lmkp,p->lmkp', real(self.wlm), self.dk)} 
         save(filename, to_save) 
         return
     
