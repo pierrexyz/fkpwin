@@ -9,5 +9,4 @@ fkpwin.egg-info/PKG-INFO
 fkpwin.egg-info/SOURCES.txt
 fkpwin.egg-info/dependency_links.txt
 fkpwin.egg-info/not-zip-safe
-fkpwin.egg-info/requires.txt
 fkpwin.egg-info/top_level.txt

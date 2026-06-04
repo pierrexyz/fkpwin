@@ -1,4 +1,4 @@
-Metadata-Version: 2.1
+Metadata-Version: 2.4
 Name: fkpwin
 Version: 0.2.0
 Summary: Window functions for FKP-like estimators of Fourier-space correlation functions
@@ -10,3 +10,7 @@ Classifier: License :: OSI Approved :: MIT License
 Classifier: Operating System :: OS Independent
 Classifier: Environment :: Console
 Classifier: Programming Language :: Python
+Dynamic: author
+Dynamic: classifier
+Dynamic: license
+Dynamic: summary

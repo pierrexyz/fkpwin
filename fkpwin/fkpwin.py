@@ -3,11 +3,12 @@ from fftlog.fftlog import FFTLog
 from fftlog.sbt import SBT, MPC
 
 class WindowMatrix(): 
-    def __init__(self, s=None, k=None, dk=None, kedges=None, ells=[0, 2, 4], NFFT=1024 * 8, smin=1., smax=1e5):
+    def __init__(self, s=None, k=None, dk=None, kedges=None, ells=[0, 2, 4], NFFT=1024 * 8, smin=1., smax=1e5, complex=True):
         
         self.ells = ells
+        self.is_complex = complex
 
-        self.fftsettings = dict(Nmax=NFFT, xmin=smin, xmax=smax, bias=-1.6, window=.2) 
+        self.fftsettings = dict(Nmax=NFFT, xmin=smin, xmax=smax, bias=-1.6, window=.2, complex=self.is_complex) 
         self.fft = FFTLog(**self.fftsettings)
 
         if s is None: s = self.fft.x # s = np.geomspace(1e-4, 1e5, 1024*16); s = s[s > smin]
@@ -32,7 +33,7 @@ class WindowMatrix():
         self.set_f2c()
 
     def set_f2c(self, NFFT=1024, kmin=1e-5, kmax=1e3): 
-        self.sbt = SBT(ells=self.ells)
+        self.sbt = SBT(ells=self.ells, complex=self.is_complex)
         self.sbt.set_f2c(self.s, kmin=kmin, kmax=kmax, bias=-2.1, NFFT=NFFT, extrap='padding') 
         return 
 
@@ -55,6 +56,7 @@ class WindowMatrix():
         return
 
     def set(self, qk, k=None, qs=None, s=None):
+
         self.set_qk(qk, k=k)
         self.set_qs(self.qs_from_qk(qk, k=k)) if qs is None else self.set_qs(qs, s=s)
         return 
